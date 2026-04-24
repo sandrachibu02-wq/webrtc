@@ -89,6 +89,6 @@ wss.on('connection', (ws) => {
   });
 });
 
-server.listen(PORT, () => {
-  console.log(`WebRTC Clipboard signaling server running on http://localhost:${PORT}`);
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`WebRTC Clipboard signaling server running on port ${PORT}`);
 });
