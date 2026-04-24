@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Room - P2P Clipboard</title>
+    <link rel="stylesheet" href="/styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+  </head>
+  <body>
+    <main class="container wide">
+      <header class="room-header">
+        <a href="/" class="back">&larr; Home</a>
+        <div class="status">
+          <span id="connDot" class="dot warn"></span>
+          <span id="connText">Waiting for peer…</span>
+        </div>
+      </header>
+
+      <section class="card share-card">
+        <div class="share-info">
+          <h2>Share this room</h2>
+          <p class="muted">Open this link on another device — or scan the QR code.</p>
+          <div class="row">
+            <input id="shareLink" type="text" readonly />
+            <button id="copyLinkBtn" class="btn">Copy</button>
+          </div>
+          <p class="meta">
+            Room <code id="roomIdLabel"></code> · 
+            <span id="peerCount">1</span> device(s) connected
+          </p>
+        </div>
+        <div class="qr-wrap">
+          <canvas id="qrcode"></canvas>
+        </div>
+      </section>
+
+      <section class="card">
+        <div class="tabs">
+          <button class="tab active" data-tab="clipboard">Clipboard</button>
+          <button class="tab" data-tab="files">Files</button>
+        </div>
+
+        <div class="tab-panel" data-panel="clipboard">
+          <textarea
+            id="clipboard"
+            placeholder="Type or paste anything here. It will appear instantly on the other device, encrypted end-to-end."
+            rows="8"
+          ></textarea>
+          <div class="row right">
+            <span id="syncIndicator" class="muted small"></span>
+            <button id="copyClipBtn" class="btn">Copy to system clipboard</button>
+          </div>
+        </div>
+
+        <div class="tab-panel hidden" data-panel="files">
+          <div id="dropzone" class="dropzone">
+            <p><strong>Drop files here</strong> or click to choose</p>
+            <p class="muted small">Files are chunked, encrypted, and sent peer-to-peer</p>
+            <input id="fileInput" type="file" multiple hidden />
+          </div>
+          <ul id="fileList" class="file-list"></ul>
+        </div>
+      </section>
+
+      <footer class="footer">
+        <span class="dot"></span>
+        End-to-end encrypted (AES-GCM 256). Server only relays signaling.
+      </footer>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>

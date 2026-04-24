@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>P2P Clipboard &amp; File Sharing</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="hero">
+        <div class="logo">
+          <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="9" y="2" width="6" height="4" rx="1" />
+            <path d="M9 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-3" />
+          </svg>
+        </div>
+        <h1>P2P Clipboard</h1>
+        <p class="tag">
+          End-to-end encrypted clipboard &amp; file sharing.
+          Direct browser-to-browser via WebRTC. No cloud storage.
+        </p>
+      </header>
+
+      <section class="card">
+        <h2>Create a room</h2>
+        <p class="muted">
+          A new room with a unique encryption key will be generated.
+          Share the link or QR code with another device to connect.
+        </p>
+        <button id="createBtn" class="btn primary">Create new room</button>
+      </section>
+
+      <section class="card">
+        <h2>Join a room</h2>
+        <p class="muted">Paste a room link you received:</p>
+        <form id="joinForm" class="row">
+          <input id="joinInput" type="text" placeholder="https://.../room.html#..." />
+          <button type="submit" class="btn">Join</button>
+        </form>
+      </section>
+
+      <footer class="footer">
+        <span class="dot"></span> Encryption key never leaves your browser
+      </footer>
+    </main>
+
+    <script>
+      document.getElementById('createBtn').addEventListener('click', async () => {
+        const res = await fetch('/api/new-room');
+        const { roomId } = await res.json();
+        // Generate 256-bit AES-GCM key, encode raw bytes in URL hash (base64url)
+        const key = await crypto.subtle.generateKey(
+          { name: 'AES-GCM', length: 256 },
+          true,
+          ['encrypt', 'decrypt']
+        );
+        const raw = new Uint8Array(await crypto.subtle.exportKey('raw', key));
+        const b64 = btoa(String.fromCharCode(...raw))
+          .replace(/\+/g, '-')
+          .replace(/\//g, '_')
+          .replace(/=+$/, '');
+        location.href = `/room.html#${roomId}.${b64}`;
+      });
+
+      document.getElementById('joinForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const v = document.getElementById('joinInput').value.trim();
+        if (!v) return;
+        try {
+          const u = new URL(v, location.origin);
+          location.href = u.pathname + u.hash;
+        } catch {
+          alert('Invalid link');
+        }
+      });
+    </script>
+  </body>
+</html>
