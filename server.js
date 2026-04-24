@@ -15,6 +15,10 @@ const crypto = require('crypto');
 const PORT = process.env.PORT || 3000;
 
 const app = express();
+
+// Health check (Render pings this)
+app.get('/healthz', (_req, res) => res.status(200).send('ok'));
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 // Friendly room ID generator
